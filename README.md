@@ -1,6 +1,12 @@
 # Be careful because otherwise they'll put up a captcha. And then you have to wait or somehow change your IP address for it to work again. Do not attempt to make this program download multiple files in parallel, and especially not in quick succession. You have been warned.
 
-Hey. This is a simple(ish) script/program to download anime from gogoanime (not going to finish that link) and save them to a directory on your device. The current working/tested build (as of 5/31/2021, 31/5/2021 for you Europeans) uses wget for every part of the transfer, and requires  a very specific set of options in the config file. But whatever. I made this mostly for myself, and if you want to use it for yourself you can debug it for yourself too. Good luck.
+Hey. This is a simple(ish) script/program to download anime from gogoanime (not going to finish that link) and save them to a directory on your device.
+The current working/tested build
+(as of 7/24/2021, 24/7/2021 for you Europeans)
+uses a combination of curl, wget, and youtube-dl,
+and requires a very specific set of options in the config file. But whatever.
+I made this mostly for myself, and if you want to use it for yourself
+you can debug it for yourself too. Good luck.
 
 =======================================================
 
@@ -8,9 +14,9 @@ Hey. This is a simple(ish) script/program to download anime from gogoanime (not 
 
 1. I recommend downloading and placing the files manually. And I won't provide another way unless someone asks.
 
-conan-dl.conf goes in the directory ```~/.config/conan-dl``` which you probably don't have. Go ahead and make it.
+conan-dl.conf goes in the directory `~/.config/conan-dl` which you probably don't have. Go ahead and make it.
 
-The executable (currently cdl-wget, but could change) goes somewhere in your ```$PATH```.
+The executable (currently cdl-wget, but could change) goes somewhere in your `$PATH`.
 
 domains.info and the other files are currently unused, but they might be used in future releases. You don't have to have them.
 
