@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# A complete rewrite of conan-dl(archived here as cdl-curl), a program which scrapes anime from basic non-JS sites.
+# This version relies on GNU Wget, which has nicer progress bars, more command-line options, and slightly better domain resolution. However, it is arguably more bloated than cURL, and so I have attempted to strike a balance between the two in the included conan-dl file. This script, however, is uses wget for everything.
+#
+# One day I may also try to replace all awk commands with sed commands for a similar reason.
+# But that time is not now. Anyway, read the code and read the config file and check the README.
+# Aight let's get down to it.
+
+source $HOME/.config/conan-dl/conan-dl.conf
+mkdir -p $outputdir
+
+#FUNCTIONS (global)
+animegg=$(
+	echo $anime |
+	sed 's/ /-/g'
+)
+fname=$(
+	echo "$anime /" |
+	awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' |
+	sed 's/[a-z]//g;s/ //g;s/\//ep/g'
+)
+wget-stream () {
+	wget -q $streamurl -O $tmpdir/cdl.tmp
+}
+find-dlhub () {
+	cat $tmpdir/cdl.tmp |
+	grep $mirrorfz1 |
+	grep owload |
+	awk '{print $3}' |
+	sed 's/href=//g;s/"//g'
+}
+wget-dlhub () {
+	wget -q $dlhub -O $tmpdir/cdl.tmp
+}
+find-mirrorurl () {
+	cat $tmpdir/cdl.tmp |
+	grep -B 2 "$resolution" |
+	grep "$mirrorfz2" |
+	awk '{print $1}' |
+	sed 's/href=//g' |
+	sed 's/"//g'
+}
+wget-mirrorurl () {
+	wget -q --show-progress $mirrorurl -O $outputdir/$fname$ep.mp4
+}
+
+#everything is inside of this FOR function now. I'm sorry.
+for ep in $(seq $firstep $lastep)
+do
+#CONTINGENT VARIABLES (keep in this script)
+streamurl=$(
+	echo $streamsite/$animegg-episode-$ep
+)
+wget-stream
+dlhub=$(find-dlhub)
+wget-dlhub
+mirrorurl=$(find-mirrorurl)
+wget-mirrorurl
+done

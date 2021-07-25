@@ -1,0 +1,57 @@
+#!/usr/bin/bash
+
+## see the README.md in the git repo and conan-dl.conf for details
+
+#read the config file
+source $HOME/.config/conan-dl/conan-dl.conf
+
+#the name the anime takes in the URL
+animegg=$(
+echo $anime |
+sed 's/ /-/g'
+)
+
+#the streamsite with SSL as a given
+streamsitegg=$(
+echo https://$streamsite | cat
+)
+
+#short name of show (yay puns) for the filenames
+sho=$(
+echo $anime |
+awk '{print toupper($0)}' |
+sed 's/\(.\)[^ ]* */\1/g' |
+awk '{print $1,"ep"}' |
+sed 's/ //'
+)
+
+#use wget to fetch download page
+wgetgg () {
+wget --show-progress -O $tmpdir/cdl-tempfile-idk $(
+wget -q $streamsite/$animegg-episode-$ep -O - |
+grep gogo-play |
+grep Download |
+awk '{print $3}' |
+sed 's/href=//;s/"//g' )
+}
+
+#where the magic happens
+getep () {
+local ep=$1
+streamurl=$(
+echo $streamsitegg/$animegg-episode-$ep
+)
+curl "$(
+curl -s "$(
+)" |
+grep $res |
+awk '{print $1}' |
+sed 's/href=//g;s/"//g;s/amp;//g'
+)" -# --output $outputdir/$sho$ep.mp4
+}
+
+for ep in $eplist
+do
+getep "$ep" &
+done
+

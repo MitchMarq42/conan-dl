@@ -1,0 +1,6 @@
+#domains file for conan-dl
+#add yours here with this format:
+
+# name		reference domain	search results URL (with $str in place of searched text)
+
+gogoanime	gogoanime.so		https://www1.gogoanime.ai//search.html?keyword=str

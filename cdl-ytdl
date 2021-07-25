@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Another rewrite. This one pretty much just gets the URL to the point where Youtube-dl can do its magic. Because it can.
+
+source ~/.config/conan-dl/conan-dl.conf
+mkdir -p $outputdir
+cd $outputdir
+animegg=$(
+	echo $anime |
+	sed 's/ /-/g'
+)
+fname=$(
+	echo "$anime /" |
+	awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' |
+	sed 's/[a-z]//g;s/ //g;s/\//ep/g'
+)
+find-rawstream () {
+	curl $streamurl |
+	grep $mirrorfz1 |
+	grep load |
+	awk '{print $3}' |
+	sed 's/href=//;s/"//g;s/download/loadserver.php/'
+}
+for ep in $(seq $firstep $lastep)
+do
+streamurl="https://$streamsite/$animegg-episode-$ep"
+
+youtube-dl $(find-rawstream)
+mv *\ $ep-loadserver.mp4 $fname$ep.mp4
+done
+#cd

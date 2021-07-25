@@ -1,0 +1,28 @@
+
+
+
+#######BEGIN HYBRID CONAN-DL, WITH THE CURL BITS INTACT#############
+# This one is made using everything I know, and quite a few things I don't. Hope it works!
+
+#places/variables to get squared away:
+	deps="bash sed awk curl wget cat grep mkdir"
+	confdir="$HOME/.config/conan-dl"
+#functions that are useful for everything
+	finalurl() { curl --silent --location --head --output /dev/null --write-out '%{url_effective}' -- "$@"; }
+# preliminary checks to make sure stuff works
+for dep in $deps
+do
+	[[ `which $dep 2>/dev/null` ]] && echo "Dependency $dep satisfied!" || echo "Error: Dependency $dep not satisfied! Please install it and continue."
+done
+
+for ep in $(seq $firstep $lastep)
+do
+	dlurl=$(curl -s $(
+		curl -s `finalurl gogoanime.ai`$animegg-episode-$ep |
+		grep gogo-play | grep ownload | awk '{print $3}' |
+		sed 's/href=//;s/"//g'
+	) |
+	grep -B 1 $res | grep "mp4" -B 1 | grep href | awk '{print $1}' | sed 's/href=//;s/"//g'
+)
+wget -nv -O "$outputdir/DCep$ep" $dlurl
+done
