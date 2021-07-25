@@ -16,7 +16,7 @@ you can debug it for yourself too. Good luck.
 
 conan-dl.conf goes in the directory `~/.config/conan-dl` which you probably don't have. Go ahead and make it.
 
-The executable (currently cdl-wget, but could change) goes somewhere in your `$PATH`.
+The executable (currently cdl-ytdl, but could change) goes somewhere in your `$PATH`.
 
 domains.info and the other files are currently unused, but they might be used in future releases. You don't have to have them.
 
