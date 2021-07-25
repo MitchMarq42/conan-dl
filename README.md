@@ -45,3 +45,5 @@ That's not a question. And I'm sorry you hate me, but you could also just mind y
 Cool. You can submit a pull request, or open an issue, or send me a letter via post. If you find my mailbox. Please don't.
 
 If you do have a genuine improvement to bring, however, do feel free to open the proper channel and submit it.
+
+5. EOF
