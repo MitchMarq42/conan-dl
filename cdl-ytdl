@@ -2,7 +2,12 @@
 
 # Another rewrite. This one pretty much just gets the URL to the point where Youtube-dl can do its magic. Because it can.
 
+# If there is a separate episode list, put each number in ~/.config/conan-dl/eplist.list separated by spaces or newlines.
 source ~/.config/conan-dl/conan-dl.conf
+eplist=$(
+    seq $firstep $lastep ||
+       cat ~/.config/conan-dl/eplist.list
+    )
 mkdir -p $outputdir
 cd $outputdir
 animegg=$(
@@ -21,7 +26,7 @@ find-rawstream () {
 	awk '{print $3}' |
 	sed 's/href=//;s/"//g;s/download/loadserver.php/'
 }
-for ep in $(seq $firstep $lastep)
+for ep in $eplist
 do
 streamurl="https://$streamsite/$animegg-episode-$ep"
 
