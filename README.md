@@ -1,12 +1,13 @@
 # Be careful because otherwise they'll put up a captcha. And then you have to wait or somehow change your IP address for it to work again. Do not attempt to make this program download multiple files in parallel, and especially not in quick succession. You have been warned.
 
 Hey. This is a simple(ish) script/program to download anime from gogoanime (not going to finish that link) and save them to a directory on your device.
-The current working/tested build
-(as of 7/24/2021, 24/7/2021 for you Europeans)
-uses a combination of curl, wget, and youtube-dl,
-and requires a very specific set of options in the config file. But whatever.
+The current build
+(as of 9/04/2021, 04/9/2021 for you Europeans)
+does not work, but
+should use a combination of curl, wget, and youtube-dl,
+and would require a very specific set of options in the config file. But whatever.
 I made this mostly for myself, and if you want to use it for yourself
-you can debug it for yourself too. Good luck.
+you can debug and fix it for yourself too. Good luck.
 
 =======================================================
 
