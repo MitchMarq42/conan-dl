@@ -22,15 +22,15 @@ fname=$(
 )
 find-rawstream () {
     curl $streamurl |
-    grep $mirrorfz1 |
-    grep load |
-    awk '{print $3}' |
-    sed 's/href=//;s/"//g;s/download/loadserver.php/'
+	sed -n -E '
+		/^[[:space:]]*<a href="#" rel="100"/{
+		s/.*data-video="([^"]*)".*/https:\1/p
+		q
+		}'
 }
 for ep in $eplist
 do
 streamurl="https://$streamsite/$animegg-episode-$ep"
-
 
 youtube-dl $(find-rawstream)
 mv *\ $ep-loadserver.mp4 $fname$ep.mp4
