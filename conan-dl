@@ -1,28 +1,92 @@
+#!/bin/sh
 
+# I've just rewrote conan-dl
+# Now in more POSIX-ish shell!
+# And though it's still cringe
+# We all love to binge
+# So I'll fix it for good, what the hell?
 
+. "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
 
-#######BEGIN HYBRID CONAN-DL, WITH THE CURL BITS INTACT#############
-# This one is made using everything I know, and quite a few things I don't. Hope it works!
-
-#places/variables to get squared away:
-	deps="bash sed awk curl wget cat grep mkdir"
-	confdir="$HOME/.config/conan-dl"
-#functions that are useful for everything
-	finalurl() { curl --silent --location --head --output /dev/null --write-out '%{url_effective}' -- "$@"; }
-# preliminary checks to make sure stuff works
-for dep in $deps
+while getopts ":a:f:l:r:h" opt;
 do
-	[[ `which $dep 2>/dev/null` ]] && echo "Dependency $dep satisfied!" || echo "Error: Dependency $dep not satisfied! Please install it and continue."
+    case $opt in
+        a)    anime=$OPTARG ;;
+        f)    firstep=$OPTARG ;;
+        l)    lastep=$OPTARG ;;
+        r)    resolution=$OPTARG ;;
+
+        h)
+            echo "Conan-dl. Use at thy peril.
+                  Options are as follows:
+                  -a    anime
+                  -f    firstep
+                  -l    lastep
+                  -r    resolution
+                  -h    show this help"
+            ;;
+    esac
 done
 
-for ep in $(seq $firstep $lastep)
-do
-	dlurl=$(curl -s $(
-		curl -s `finalurl gogoanime.ai`$animegg-episode-$ep |
-		grep gogo-play | grep ownload | awk '{print $3}' |
-		sed 's/href=//;s/"//g'
-	) |
-	grep -B 1 $res | grep "mp4" -B 1 | grep href | awk '{print $1}' | sed 's/href=//;s/"//g'
+echo "Anime: $anime"
+echo "Episodes: $firstep to $lastep"
+echo "Resolution: $resolution"
+
+search_anime () {
+    # get proper anime name along with its id
+    search=$(printf '%s' "$1" | tr ' ' '-' )
+    titlepattern='<a href="/category/'
+
+    curl -s "https://gogoanime.pe//search.html" \
+        -G \
+        -d "keyword=$search" |
+    sed -n -E '
+        s_^[[:space:]]*<a href="/category/([^"]*)" title="([^"]*)".*_\1_p
+        '
+}
+
+animegg=$(
+search_anime "$anime" |
+    fzf
 )
-wget -nv -O "$outputdir/DCep$ep" $dlurl
+
+echo $animegg
+
+get_embedurl() {
+    animegg=$1
+    epnum=$2
+    curl -s "https://gogoanime.vc/$animegg-episode-$epnum" |
+    sed -n -E '
+        /^[[:space:]]*<a href="#" rel="100"/{
+        s/.*data-video="([^"]*)".*/https:\1/p
+        q
+        }'
+}
+get_streamurl() {
+    embedurl="$1"
+    streamurl=$(curl -s "$embedurl" |
+    sed -n -E '
+        /^[[:space:]]*sources:/{
+        s/.*(https[^'\'']*).*/\1/p
+        q
+        }
+        ')
+    printf '%s' "$streamurl" | sed -n -E "s/(.*)\.m3u8/\1.$resolution.m3u8/p"
+}
+
+eps=$(seq $firstep $lastep 2>/dev/null || cat ${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list)
+
+for epnum in $eps
+do
+    embedurl=$(get_embedurl "$animegg" "$epnum")
+    streamurl=$(get_streamurl "$embedurl")
+    # echo $embedurl
+    # echo $streamurl
+    (youtube-dl \
+        "--add-header=Referer: $embedurl" \
+        "$streamurl" -q && \
+        echo "finished downloading episode $epnum") &
+    echo "downloading episode $epnum"
 done
+
+wait && echo "all done!"
