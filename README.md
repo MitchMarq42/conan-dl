@@ -1,15 +1,15 @@
-# Be careful because otherwise they'll put up a captcha. And then you have to wait or somehow change your IP address for it to work again. Do not attempt to make this program download multiple files in parallel, and especially not in quick succession. You have been warned.
+# This is working now. Sort of. Somehow. Directories and filenames are broken, but it does read the config file, and it does download episodes.
 
 Hey. This is a simple(ish) script/program to download anime from gogoanime (not going to finish that link) and save them to a directory on your device.
 The current build
-(as of 9/04/2021, 04/9/2021 for you Europeans)
-does not work, but
-should use a combination of curl, wget, and youtube-dl,
-and would require a very specific set of options in the config file. But whatever.
+(as of 10/26/2021, 26/10/2021 for you Europeans)
+does work, and
+uses a combination of curl, youtube-dl, and various arcane shell-isms
+and requires some semi-specific options in the config file. But whatever.
 I made this mostly for myself, and if you want to use it for yourself
 you can debug and fix it for yourself too. Good luck.
 
-=======================================================
+---
 
 ## Installation:
 
@@ -17,7 +17,7 @@ you can debug and fix it for yourself too. Good luck.
 
 conan-dl.conf goes in the directory `~/.config/conan-dl` which you probably don't have. Go ahead and make it.
 
-The executable (currently cdl-ytdl, but could change) goes somewhere in your `$PATH`.
+The executable (currently conan-dl, but could change) goes somewhere in your `$PATH`.
 
 domains.info and the other files are currently unused, but they might be used in future releases. You don't have to have them.
 
@@ -53,4 +53,4 @@ Cool. You can submit a pull request, or open an issue, or send me a letter via p
 
 If you do have a genuine improvement to bring, however, do feel free to open the proper channel and submit it.
 
-5. EOF
+EOF
