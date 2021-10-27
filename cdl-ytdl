@@ -22,11 +22,11 @@ fname=$(
 )
 find-rawstream () {
     curl $streamurl |
-	sed -n -E '
-		/^[[:space:]]*<a href="#" rel="100"/{
-		s/.*data-video="([^"]*)".*/https:\1/p
-		q
-		}'
+    sed -n -E '
+        /^[[:space:]]*<a href="#" rel="100"/{
+        s/.*data-video="([^"]*)".*/https:\1/p
+        q
+        }'
 }
 for ep in $eplist
 do
