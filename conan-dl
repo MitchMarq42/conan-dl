@@ -105,6 +105,5 @@ do
         echo "finished downloading episode $epnum") &
     echo "downloading episode $epnum"
 done
-cd $startingdir
 
-wait && echo "all done!"
+wait && cd $startingdir && echo "all done!"
