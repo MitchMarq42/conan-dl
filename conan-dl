@@ -19,9 +19,8 @@ depcheck() {
     echo "$dep not found! Go install it right now."
     done
 }
-( "$@" == '--depcheck' && depcheck; exit)
 
-while getopts ":a:f:l:r:h" opt;
+while getopts ":s:a:f:l:r:o:m:h" opt;
 do
     case $opt in
         s)    streamsite=$OPTARG;;
@@ -92,6 +91,8 @@ get_streamurl() {
 
 eps=$(seq $firstep $lastep 2>/dev/null || cat ${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list)
 
+startingdir="$PWD"
+mkdir -p "$outputdir" && cd "$outputdir"
 for epnum in $eps
 do
     embedurl=$(get_embedurl "$animegg" "$epnum")
@@ -104,5 +105,6 @@ do
         echo "finished downloading episode $epnum") &
     echo "downloading episode $epnum"
 done
+cd $startingdir
 
 wait && echo "all done!"
