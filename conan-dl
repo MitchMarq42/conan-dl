@@ -8,6 +8,16 @@
 
 . "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
 
+deps="sh curl sed fzf youtube-dl"
+depcheck() {
+    for dep in $deps
+    do
+        which $dep >/dev/null &&
+        echo "Dependency $dep satisfied!" ||
+	echo "$dep not found! Go install it right now."
+    done
+}
+
 while getopts ":a:f:l:r:h" opt;
 do
     case $opt in
@@ -15,7 +25,7 @@ do
         f)    firstep=$OPTARG ;;
         l)    lastep=$OPTARG ;;
         r)    resolution=$OPTARG ;;
-
+        d)    depcheck ;;
         h)
             echo "Conan-dl. Use at thy peril.
                   Options are as follows:
