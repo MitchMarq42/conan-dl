@@ -6,6 +6,8 @@
 # We all love to binge
 # So I'll fix it for good, what the hell?
 
+tmpdir="${TMPDIR:-/tmp}"
+menu="fzf"
 . "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
 
 deps="sh curl sed fzf youtube-dl"
@@ -14,21 +16,25 @@ depcheck() {
     do
         which $dep >/dev/null &&
         echo "Dependency $dep satisfied!" ||
-	echo "$dep not found! Go install it right now."
+    echo "$dep not found! Go install it right now."
     done
 }
+( "$@" == '--depcheck' && depcheck; exit)
 
 while getopts ":a:f:l:r:h" opt;
 do
     case $opt in
+        s)    streamsite=$OPTARG;;
         a)    anime=$OPTARG ;;
         f)    firstep=$OPTARG ;;
         l)    lastep=$OPTARG ;;
         r)    resolution=$OPTARG ;;
-        d)    depcheck ;;
+        o)    outputdir=$OPTARG ;;
+        m)    menu=$OPTARG ;;
         h)
             echo "Conan-dl. Use at thy peril.
                   Options are as follows:
+                  -s    streamsite
                   -a    anime
                   -f    firstep
                   -l    lastep
@@ -44,7 +50,7 @@ echo "Resolution: $resolution"
 
 search_anime () {
     # get proper anime name along with its id
-    search=$(printf '%s' "$1" | tr ' ' '-' )
+    search=$(printf '%s' "$1" | sed 's/\s/-/g' )
     titlepattern='<a href="/category/'
 
     curl -s "https://gogoanime.pe//search.html" \
@@ -57,10 +63,10 @@ search_anime () {
 
 animegg=$(
 search_anime "$anime" |
-    fzf
+    $menu
 )
 
-echo $animegg
+echo "Actual anime: $animegg"
 
 get_embedurl() {
     animegg=$1
