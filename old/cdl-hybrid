@@ -1,3 +1,7 @@
+### THIS IS THE OLD VERSION THAT NEVER TRULY EXISTED.
+### IT ALSO CONTAINS TABS, WHICH ARE JUST WORST SPACES.
+### DO NOT USE IT.
+
 #!/usr/bin/env bash
 
 # A complete rewrite of conan-dl(archived here as cdl-curl) and improving all inefficiencis of cdl-wget: a program which scrapes anime from basic non-JS sites.

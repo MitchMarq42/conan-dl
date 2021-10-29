@@ -1,3 +1,7 @@
+### THIS IS THE MOST RECENT FAILED VERSION.
+### PERHAPS I JUST HATE LOOKING AT OLD CODE.
+### ANYWAY, USE THE REAL CONAN-DL.
+
 #!/bin/bash
 
 # Another rewrite. This one pretty much just gets the URL to the point where Youtube-dl can do its magic. Because it can.
