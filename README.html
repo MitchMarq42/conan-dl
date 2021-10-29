@@ -1,6 +1,6 @@
-<h1>This is working now. Sort of. Somehow. Directories and filenames are broken, but it does read the config file, and it does download episodes.</h1>
+<h1>This is working now. Sort of. Somehow. Filenames are broken, but it does read the config file, and it does download episodes to the proper directory.</h1>
 
-<p>Hey. This is a simple(ish) script/program to download anime from gogoanime (not going to finish that link) and save them to a directory on your device.
+<p>Hey. This is a simple(ish) script/program to download anime from gogoanime.vc and save them to a directory on your device.
 The current build
 (as of 10/26/2021, 26/10/2021 for you Europeans)
 does work, and
@@ -14,24 +14,30 @@ you can debug and fix it for yourself too. Good luck.</p>
 <h2>Installation:</h2>
 
 <ol>
-<li>I recommend downloading and placing the files manually. And I won&rsquo;t provide another way unless someone asks.</li>
+<li><p>Dependencies:</p></li>
+<li><p>A POSIX-compliant shell. Basically anything other than <code>fish</code> or <code>powershell</code> will work, and this can still be called even from those.</p></li>
+<li><p><code>curl</code> (if you don&rsquo;t know, you probably have it)</p></li>
+<li><p><code>sed</code> (if you don&rsquo;t know, you probably have it)</p></li>
+<li><p><code>youtube-dl</code></p></li>
+<li><p><code>fzf</code> or another simple menu like <code>dmenu</code>. Must be specified with the <code>$menu</code> variable.</p></li>
+<li><p>I recommend downloading and placing the files manually. And I won&rsquo;t provide another way unless someone asks.</p></li>
 </ol>
 
 
-<p>conan-dl.conf goes in the directory <code>~/.config/conan-dl</code> which you probably don&rsquo;t have. Go ahead and make it.</p>
+<p>  conan-dl.conf goes in the directory <code>~/.config/conan-dl</code> which you probably don&rsquo;t have. Go ahead and make it.</p>
 
-<p>The executable (currently conan-dl, but could change) goes somewhere in your <code>$PATH</code>.</p>
+<p>  The executable (currently conan-dl, but could change) goes somewhere in your <code>$PATH</code>.</p>
 
-<p>domains.info and the other files are currently unused, but they might be used in future releases. You don&rsquo;t have to have them.</p>
+<p>  domains.info and the other files are currently unused, but they might be used in future releases. You don&rsquo;t have to have them.</p>
 
 <ol>
 <li>Modify the config file conan-dl.conf</li>
 </ol>
 
 
-<p>tmpdir should be /tmp</p>
+<p>  tmpdir should be /tmp</p>
 
-<p>Anything else, you&rsquo;re on your own</p>
+<p>  Anything else, you&rsquo;re on your own</p>
 
 <h2>FAQ:</h2>
 
@@ -42,33 +48,33 @@ you can debug and fix it for yourself too. Good luck.</p>
 </ol>
 
 
-<p>Not really, but neither is the service it&rsquo;s relying on. So running this script has the same legality as just streaming the content directly from their website&ndash; THEY hold the blame, you are just a lurking beneficiary of their illicit service.</p>
+<p>  Not really, but neither is the service it&rsquo;s relying on. So running this script has the same legality as just streaming the content directly from their website&ndash; THEY hold the blame, you are just a lurking beneficiary of their illicit service.</p>
 
-<p>That said, DO NOT sell anything you get using this. Probably don&rsquo;t brag about it either. If you use my software and make extremely dumb mistakes like getting caught in a prosecutable act, I will deny any involvement and laugh at you. And in return if I make that mistake you can laugh at me.</p>
+<p>  That said, DO NOT sell anything you get using this. Probably don&rsquo;t brag about it either. If you use my software and make extremely dumb mistakes like getting caught in a prosecutable act, I will deny any involvement and laugh at you. And in return if I make that mistake you can laugh at me.</p>
 
 <ol>
 <li>It doesn&rsquo;t work!!</li>
 </ol>
 
 
-<p>Of course not. I&rsquo;m basically trying to match pace with gogoanime, who are themselves sprinting at arm&rsquo;s length to get away from the FBI and countless Japanese legal teams. Changing URLs and server hosts is basically unavoidable for them. And if I made a tool that could actually keep track of that, so could anyone. And that might mean the end.</p>
+<p>  Of course not. I&rsquo;m basically trying to match pace with gogoanime, who are themselves sprinting at arm&rsquo;s length to get away from the FBI and countless Japanese legal teams. Changing URLs and server hosts is basically unavoidable for them. And if I made a tool that could actually keep track of that, so could anyone. And that might mean the end.</p>
 
-<p>Oh, you want to fix it? Run the script with <code>bash -x `which conan-dl`</code> and see what step it gets stuck on. Probably some variable never got defined, or some other stupid error happened. One thing you can do is open the last successful URL in your browser, and add &ldquo;view-source:&rdquo; to the beginning of the URL. This will print out the raw HTML, which you can then scroll through or use your browser&rsquo;s ctrl-F to locate the offending string. Try changing the mirrorfz values in the config file or something.</p>
+<p>  Oh, you want to fix it? Run the script with <code>bash -x `which conan-dl`</code> and see what step it gets stuck on. Probably some variable never got defined, or some other stupid error happened. One thing you can do is open the last successful URL in your browser, and add &ldquo;view-source:&rdquo; to the beginning of the URL. This will print out the raw HTML, which you can then scroll through or use your browser&rsquo;s ctrl-F to locate the offending string. Try changing the mirrorfz values in the config file or something.</p>
 
 <ol>
 <li>You are evil and I hate this in every way. Take it down!</li>
 </ol>
 
 
-<p>That&rsquo;s not a question. And I&rsquo;m sorry you hate me, but you could also just mind your own business. And I&rsquo;m not just taking this down because someone hates it. I&rsquo;ll take it down if I get in trouble for it, and even if that never happens it&rsquo;ll probably be deprecated pretty quickly anyways (see answer to #2).</p>
+<p>  That&rsquo;s not a question. And I&rsquo;m sorry you hate me, but you could also just mind your own business. And I&rsquo;m not just taking this down because someone hates it. I&rsquo;ll take it down if I get in trouble for it, and even if that never happens it&rsquo;ll probably be deprecated pretty quickly anyways (see answer to #2).</p>
 
 <ol>
 <li>I want to help</li>
 </ol>
 
 
-<p>Cool. You can submit a pull request, or open an issue, or send me a letter via post. If you find my mailbox. Please don&rsquo;t.</p>
+<p>  Cool. You can submit a pull request, or open an issue, or send me a letter via post. If you find my mailbox. Please don&rsquo;t.</p>
 
-<p>If you do have a genuine improvement to bring, however, do feel free to open the proper channel and submit it.</p>
+<p>  If you do have a genuine improvement to bring, however, do feel free to open the proper channel and submit it.</p>
 
 <p>EOF</p>
