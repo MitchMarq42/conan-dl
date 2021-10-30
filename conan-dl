@@ -105,8 +105,8 @@ do
     (youtube-dl \
         "--add-header=Referer: $embedurl" \
         "$streamurl" -q && \
-        echo "finished downloading episode $epnum") &
-    echo "downloading episode $epnum"
+        echo "finished downloading episode $epnum!") &
+    echo "downloading episode $epnum..."
 done
 
-wait && cd $startingdir && echo "all done!"
+wait && cd $startingdir && echo "all done. Go outside."
