@@ -65,4 +65,16 @@ I've never been asked about this, but here are some hypothetically important que
 
   If you do have a genuine improvement to bring, however, do feel free to open the proper channel and submit it.
 
+## Special Thanks:
+
+- (pystardust)[https://github.com/pystardust] for making this concept popular
+
+- (Dink4n)[https://github.com/Dink4n] for fixing his work and thus mine
+
+- Texas Instruments for embedding an interesting language into their ~~80s iPhones~~calculators
+
+- My friends Charles and Macklen for getting me into anime and coding, respectively
+
+- Sir Tim Burners Lee for the Internet
+
 EOF
