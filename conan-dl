@@ -39,6 +39,7 @@ do
                   -l    lastep
                   -r    resolution
                   -h    show this help"
+            exit 0
             ;;
     esac
 done
