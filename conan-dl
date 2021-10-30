@@ -6,6 +6,7 @@
 # We all love to binge
 # So I'll fix it for good, what the hell?
 
+startingdir="$PWD"
 tmpdir="${TMPDIR:-/tmp}"
 menu="fzf"
 . "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
@@ -20,7 +21,7 @@ depcheck() {
     done
 }
 
-while getopts ":s:a:f:l:r:o:m:h" opt;
+while getopts ":s:a:f:l:r:o:m:hw" opt;
 do
     case $opt in
         s)    streamsite=$OPTARG;;
@@ -41,6 +42,7 @@ do
                   -h    show this help"
             exit 0
             ;;
+        w)    watch=yes ;;
     esac
 done
 
@@ -66,6 +68,7 @@ search_anime "$anime" |
     $menu
 )
 
+[ $watch == "yes" ] && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
 echo "Actual anime: $animegg"
 
 get_embedurl() {
@@ -92,7 +95,6 @@ get_streamurl() {
 
 eps=$(seq $firstep $lastep 2>/dev/null || cat ${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list)
 
-startingdir="$PWD"
 mkdir -p "$outputdir" && cd "$outputdir"
 for epnum in $eps
 do
