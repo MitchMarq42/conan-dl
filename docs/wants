@@ -1,6 +1,0 @@
-syntax: conan-dl [OPERATION] [ANIME] [FIRST EP] [LAST EP] [OUTPUTDIR] [RESOLUTION]
-	conan-dl -dt
-
--d, --depcheck: test whether dependencies and necessary files are installed.
--t, --test: get updated URLs for each of the sites in domains.info
-fetch: get the anime
