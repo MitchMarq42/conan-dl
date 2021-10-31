@@ -96,6 +96,7 @@ get_streamurl() {
 eps=$(seq $firstep $lastep 2>/dev/null || cat ${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list)
 
 mkdir -p "$outputdir" && cd "$outputdir"
+echo "This might take a while. Go outside."
 for epnum in $eps
 do
     embedurl=$(get_embedurl "$animegg" "$epnum")
@@ -104,9 +105,10 @@ do
     # echo $streamurl
     (youtube-dl \
         "--add-header=Referer: $embedurl" \
+        "--restrict-filenames" \
         "$streamurl" -q && \
         echo "finished downloading episode $epnum!") &
     echo "downloading episode $epnum..."
 done
 
-wait && cd $startingdir && echo "all done. Go outside."
+wait && cd $startingdir && echo "all done."
