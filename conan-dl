@@ -68,7 +68,7 @@ search_anime "$anime" |
     $menu
 )
 
-[ $watch == "yes" ] && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
+[ $watch == "yes" ] >/dev/null && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
 echo "Actual anime: $animegg"
 
 get_embedurl() {
@@ -107,7 +107,8 @@ do
         "--add-header=Referer: $embedurl" \
         "--restrict-filenames" \
         "$streamurl" -q && \
-        echo "finished downloading episode $epnum!") &
+        echo "finished downloading episode $epnum" ||
+        echo "Failed to download episode $epnum!!!") &
     echo "downloading episode $epnum..."
 done
 
