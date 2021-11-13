@@ -55,7 +55,7 @@ search_anime () {
     search=$(printf '%s' "$1" | sed 's/\s/-/g' )
     titlepattern='<a href="/category/'
 
-    curl -s "https://gogoanime.pe//search.html" \
+    curl -s "https://$streamsite//search.html" \
         -G \
         -d "keyword=$search" |
     sed -n -E '
@@ -74,7 +74,7 @@ echo "Actual anime: $animegg"
 get_embedurl() {
     animegg=$1
     epnum=$2
-    curl -s "https://gogoanime.vc/$animegg-episode-$epnum" |
+    curl -s "https://$streamsite/$animegg-episode-$epnum" |
     sed -n -E '
         /^[[:space:]]*<a href="#" rel="100"/{
         s/.*data-video="([^"]*)".*/https:\1/p
@@ -103,7 +103,7 @@ do
     streamurl=$(get_streamurl "$embedurl")
     # echo $embedurl
     # echo $streamurl
-    (youtube-dl \
+    (yt-dlp \
         "--add-header=Referer: $embedurl" \
         "--restrict-filenames" \
         "$streamurl" -q && \
