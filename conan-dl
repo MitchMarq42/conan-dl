@@ -6,9 +6,11 @@
 # We all love to binge
 # So I'll fix it for good, what the hell?
 
+# default variable assignments
 startingdir="$PWD"
 tmpdir="${TMPDIR:-/tmp}"
 menu="fzf"
+# Source the config file
 . "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
 
 deps="sh curl sed fzf youtube-dl"
@@ -21,7 +23,7 @@ depcheck() {
     done
 }
 
-while getopts ":s:a:f:l:r:o:m:hw" opt;
+while getopts ":s:a:f:l:r:o:m:hwd" opt;
 do
     case $opt in
         s)    streamsite=$OPTARG;;
@@ -39,10 +41,12 @@ do
                   -f    firstep
                   -l    lastep
                   -r    resolution
+                  -m    menu
                   -h    show this help"
             exit 0
             ;;
         w)    watch=yes ;;
+        d)    depcheck; exit ;;
     esac
 done
 
@@ -63,12 +67,16 @@ search_anime () {
         '
 }
 
-animegg=$(
+get_animegg() {
 search_anime "$anime" |
-    $menu
-)
+    $menu ||
+    exit 1
+}
 
-[ $watch == "yes" ] >/dev/null && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
+animegg=$(get_animegg)
+
+# BROKEN
+#[ $watch == "yes" ] >/dev/null && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
 echo "Actual anime: $animegg"
 
 get_embedurl() {
