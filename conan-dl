@@ -100,6 +100,15 @@ get_streamurl() {
         ')
     printf '%s' "$streamurl" | sed -n -E "s/(.*)\.m3u8/\1.$resolution.m3u8/p"
 }
+get_episode() {
+    epnum=$1
+    embedurl=$2
+    streamurl=$3
+    yt-dlp \
+        "--add-header=Referer: $embedurl" \
+        "--restrict-filenames" \
+        "$streamurl" 2>/dev/null 1>/dev/null
+}
 
 eps=$(seq $firstep $lastep 2>/dev/null || cat ${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list)
 
@@ -111,13 +120,12 @@ do
     streamurl=$(get_streamurl "$embedurl")
     # echo $embedurl
     # echo $streamurl
-    (yt-dlp \
-        "--add-header=Referer: $embedurl" \
-        "--restrict-filenames" \
-        "$streamurl" -q && \
+    (get_episode $epnum $embedurl $streamurl && \
         echo "finished downloading episode $epnum" ||
         echo "Failed to download episode $epnum!!!") &
     echo "downloading episode $epnum..."
 done
 
-wait && cd $startingdir && echo "all done."
+wait
+
+cd $startingdir && echo "all done."
