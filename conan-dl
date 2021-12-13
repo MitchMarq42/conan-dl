@@ -6,24 +6,30 @@
 # We all love to binge
 # So I'll fix it for good, what the hell?
 
+# Yes sadly it seems this is growing
+# Far beyond my own mind's knowing
+# You will know what I meant
+# By the time that I've spent
+# And the way that I still over-comment!
+
 # default variable assignments
 startingdir="$PWD"
 tmpdir="${TMPDIR:-/tmp}"
-menu="fzf"
+menu="fzf" # Also see config file, it re-defines this if the value is set.
 # Source the config file
-. "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
+. "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf" # in `dash`, the source command does not exist, but . does the same thing
 
-deps="sh curl sed fzf youtube-dl"
+deps="sh curl sed fzf yt-dlp" # an arbitrary array. Needs fixing
 depcheck() {
     for dep in $deps
     do
-        which "$dep" >/dev/null &&
+        which "$dep" >/dev/null && # On future OSes the `which` utility may be deprecated. `type` may be your friend
         echo "Dependency $dep satisfied!" ||
     echo "$dep not found! Go install it right now."
     done
 }
 
-while getopts ":s:a:f:l:r:o:m:hwd" opt;
+while getopts ":s:a:f:l:r:o:m:hwd" opt; # Long options would be nice, but limit portability.
 do
     case $opt in
         s)    streamsite=$OPTARG;;
@@ -34,7 +40,7 @@ do
         o)    outputdir=$OPTARG ;;
         m)    menu=$OPTARG ;;
         h)
-            cat <<!EOF
+            cat <<!EOF # this is a heredoc. Basically the snippet of a more civilized age.
 Conan-dl. Use at thy peril.
       Options are as follows:
       -s    streamsite
@@ -47,24 +53,26 @@ Conan-dl. Use at thy peril.
 !EOF
             exit 0
             ;;
-        w)    watch=yes ;;
+        w)    watch=yes ;; # not implemented. Maybe in the future when this is merged into ani-cli?
         d)    depcheck; exit ;;
         *)    echo "Invalid option. Go home."; exit ;;
     esac
 done
 
+# Get a feel for the terminal
 LINES=$(tput lines)
 COLUMNS=$(tput cols)
 _=$((totaleps=(lastep-firstep+1) ))
 _=$((termstart=(LINES-totaleps-1) ))
 
+# Display human-readable info. Sanity check.
 echo "Anime: $anime"
 echo "Episodes: $firstep to $lastep"
 echo "Resolution: $resolution"
 
 search_anime () {
-    # get proper anime name along with its id
-    search=$(printf '%s' "$1" | sed 's/\s/-/g' )
+    # get proper anime name
+    search=$(echo "$1" | sed 's/\s/-/g' )
     curl -s "https://$streamsite//search.html" \
         -G \
         -d "keyword=$search" |
@@ -85,8 +93,8 @@ animegg=$(get_animegg)
 echo "Actual anime: $animegg"
 
 get_embedurl() {
-    animegg=$1
-    epnum=$2
+    animegg=$1 #pass in parameters
+    epnum=$2 #pass in parameters
     curl -s "https://$streamsite/$animegg-episode-$epnum" |
     sed -n -E '
         /^[[:space:]]*<a href="#" rel="100"/{
