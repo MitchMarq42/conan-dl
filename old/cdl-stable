@@ -17,7 +17,7 @@ deps="sh curl sed fzf youtube-dl"
 depcheck() {
     for dep in $deps
     do
-        which "$dep" >/dev/null &&
+        which $dep >/dev/null &&
         echo "Dependency $dep satisfied!" ||
     echo "$dep not found! Go install it right now."
     done
@@ -34,29 +34,21 @@ do
         o)    outputdir=$OPTARG ;;
         m)    menu=$OPTARG ;;
         h)
-            cat <<!EOF
-Conan-dl. Use at thy peril.
-      Options are as follows:
-      -s    streamsite
-      -a    anime
-      -f    firstep
-      -l    lastep
-      -r    resolution
-      -m    menu
-      -h    show this help
-!EOF
+            echo "Conan-dl. Use at thy peril.
+                  Options are as follows:
+                  -s    streamsite
+                  -a    anime
+                  -f    firstep
+                  -l    lastep
+                  -r    resolution
+                  -m    menu
+                  -h    show this help"
             exit 0
             ;;
         w)    watch=yes ;;
         d)    depcheck; exit ;;
-        *)    echo "Invalid option. Go home."; exit ;;
     esac
 done
-
-LINES=$(tput lines)
-COLUMNS=$(tput cols)
-_=$((totaleps=(lastep-firstep+1) ))
-_=$((termstart=(LINES-totaleps-1) ))
 
 echo "Anime: $anime"
 echo "Episodes: $firstep to $lastep"
@@ -65,6 +57,8 @@ echo "Resolution: $resolution"
 search_anime () {
     # get proper anime name along with its id
     search=$(printf '%s' "$1" | sed 's/\s/-/g' )
+    titlepattern='<a href="/category/'
+
     curl -s "https://$streamsite//search.html" \
         -G \
         -d "keyword=$search" |
@@ -75,7 +69,8 @@ search_anime () {
 
 get_animegg() {
 search_anime "$anime" |
-    $menu
+    $menu ||
+    exit 1
 }
 
 animegg=$(get_animegg)
@@ -109,46 +104,28 @@ get_episode() {
     epnum=$1
     embedurl=$2
     streamurl=$3
-    #echo streamurl = "$streamurl"
     yt-dlp \
-        "$streamurl" \
         "--add-header=Referer: $embedurl" \
         "--restrict-filenames" \
-        "--quiet" \
-        "--progress" \
-        "--newline"
-        #"--output ep.$epnum.%(ext)s" \
+        "$streamurl" 2>/dev/null 1>/dev/null
 }
 
-eps=$(seq "$firstep" "$lastep" 2>/dev/null || cat "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list")
+eps=$(seq $firstep $lastep 2>/dev/null || cat ${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list)
 
 mkdir -p "$outputdir" && cd "$outputdir"
-mkdir -p "$tmpdir/cdl"
 echo "This might take a while. Go outside."
 for epnum in $eps
 do
     embedurl=$(get_embedurl "$animegg" "$epnum")
     streamurl=$(get_streamurl "$embedurl")
-    get_episode "$epnum" "$embedurl" "$streamurl" >"$tmpdir/cdl/$epnum.status" 2>/dev/null &
- #&& \        # echo "finished downloading episode $epnum" ||
-        # echo "Failed to download episode $epnum!!!" &
-    # echo "downloading episode $epnum..."
+    # echo $embedurl
+    # echo $streamurl
+    (get_episode $epnum $embedurl $streamurl && \
+        echo "finished downloading episode $epnum" ||
+        echo "Failed to download episode $epnum!!!") &
+    echo "downloading episode $epnum..."
 done
-
-tput sc
-while true
-do
-    tput rc
-    >"$tmpdir/cdl/statusall.tmp"
-    for epnum in $eps
-    do
-        tail -n 1 "$tmpdir/cdl/$epnum.status" >> "$tmpdir/cdl/statusall.tmp"
-        # rm $tmpdir/cdl/$epnum.status
-    done
-    cat "$tmpdir/cdl/statusall.tmp"
-    sleep 0.5
-done
-exit
 
 wait
-cd "$startingdir" && echo "all done."
+
+cd $startingdir && echo "all done."
