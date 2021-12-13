@@ -59,6 +59,9 @@ Conan-dl. Use at thy peril.
     esac
 done
 
+# Clean up resolution
+resolution=$(echo $resolution | sed 's/p$//;s/P$//')
+
 # Get a feel for the terminal
 LINES=$(tput lines)
 COLUMNS=$(tput cols)
