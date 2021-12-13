@@ -40,7 +40,7 @@ do
         o)    outputdir=$OPTARG ;;
         m)    menu=$OPTARG ;;
         h)
-            cat <<!EOF # this is a heredoc. Basically the snippet of a more civilized age.
+            cat <<-EOF # this is a heredoc. Basically the snippet of a more civilized age.
 Conan-dl. Use at thy peril.
       Options are as follows:
       -s    streamsite
@@ -50,7 +50,7 @@ Conan-dl. Use at thy peril.
       -r    resolution
       -m    menu
       -h    show this help
-!EOF
+EOF
             exit 0
             ;;
         w)    watch=yes ;; # not implemented. Maybe in the future when this is merged into ani-cli?
@@ -59,7 +59,7 @@ Conan-dl. Use at thy peril.
     esac
 done
 
-# Clean up resolution
+# Clean up values
 resolution=$(echo $resolution | sed 's/p$//;s/P$//')
 
 # Get a feel for the terminal
@@ -67,6 +67,20 @@ LINES=$(tput lines)
 COLUMNS=$(tput cols)
 _=$((totaleps=(lastep-firstep+1) ))
 _=$((termstart=(LINES-totaleps-1) ))
+
+search_eps () {
+    # get final episode number of $animiegg
+    animegg=$1
+    curl -s "https://$streamsite/category/$animegg" |
+    sed -n -E '
+        /^[[:space:]]*<a href="#" class="active" ep_start/{
+        s/.* '\''([0-9]*)'\'' ep_end = '\''([0-9]*)'\''.*/\2/p
+        q
+        }
+        '
+}
+[ $lastep = 'END' ] &&
+    lastep=$(search_eps $animegg)
 
 # Display human-readable info. Sanity check.
 echo "Anime: $anime"
