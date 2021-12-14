@@ -65,8 +65,8 @@ resolution=$(echo $resolution | sed 's/p$//;s/P$//')
 # Get a feel for the terminal
 LINES=$(tput lines)
 COLUMNS=$(tput cols)
-_=$((totaleps=(lastep-firstep+1) ))
-_=$((termstart=(LINES-totaleps-1) ))
+# _=$((totaleps=(lastep-firstep+1) ))
+# _=$((termstart=(LINES-totaleps-1) ))
 
 search_eps () {
     # get final episode number of $animiegg
@@ -79,8 +79,6 @@ search_eps () {
         }
         '
 }
-[ $lastep = 'END' ] &&
-    lastep=$(search_eps $animegg)
 
 # Display human-readable info. Sanity check.
 echo "Anime: $anime"
@@ -104,6 +102,9 @@ search_anime "$anime" |
 }
 
 animegg=$(get_animegg)
+
+[ $lastep = 'END' ] &&
+    lastep=$(search_eps $animegg)
 
 # BROKEN
 #[ $watch == "yes" ] >/dev/null && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
