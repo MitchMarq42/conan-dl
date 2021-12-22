@@ -1,9 +1,9 @@
+#!/usr/bin/bash
+
 ### THIS IS THE OLD VERSION.
 ### IT IS OLD AND NO LONGER WORKS.
 ### IT IS ALSO BADLY INDENTED.
 ### THIS MAY BE BECAUSE IT WAS MY FIRST "REAL" PROGRAM EVER.
-
-#!/usr/bin/bash
 
 ## see the README.md in the git repo and conan-dl.conf for details
 

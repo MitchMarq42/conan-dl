@@ -1,8 +1,8 @@
+#!/usr/bin/env bash
+
 ### THIS IS THE OLD VERSION. IT DOESN'T MATTER.
 ### IT ALSO CREATES A BUNCH OF EXTRA FILES IN /tmp.
 ### DO NOT USE IT, IT DOESN'T WORK.
-
-#!/usr/bin/env bash
 
 # A complete rewrite of conan-dl(archived here as cdl-curl), a program which scrapes anime from basic non-JS sites.
 # This version relies on GNU Wget, which has nicer progress bars, more command-line options, and slightly better domain resolution. However, it is arguably more bloated than cURL, and so I have attempted to strike a balance between the two in the included conan-dl file. This script, however, is uses wget for everything.
