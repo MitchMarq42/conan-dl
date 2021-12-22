@@ -149,13 +149,13 @@ get_episode() {
 eps=$(seq "$firstep" "$lastep" 2>/dev/null || cat "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/eplist.list")
 
 mkdir -p "$outputdir" && cd "$outputdir"
-mkdir -p "$tmpdir/cdl"
+mkdir -p "$tmpdir/cdl/$animegg"
 echo "This might take a while. Go outside."
 for epnum in $eps
 do
     embedurl=$(get_embedurl "$animegg" "$epnum")
     streamurl=$(get_streamurl "$embedurl")
-    get_episode "$epnum" "$embedurl" "$streamurl" >"$tmpdir/cdl/$epnum.status" 2>/dev/null &
+    get_episode "$epnum" "$embedurl" "$streamurl" >"$tmpdir/cdl/$animegg/$epnum.status" 2>/dev/null &
  #&& \        # echo "finished downloading episode $epnum" ||
         # echo "Failed to download episode $epnum!!!" &
     # echo "downloading episode $epnum..."
@@ -165,13 +165,13 @@ tput sc
 while true
 do
     tput rc
-    >"$tmpdir/cdl/statusall.tmp"
+    >"$tmpdir/cdl/$animegg/statusall.tmp"
     for epnum in $eps
     do
-        tail -n 1 "$tmpdir/cdl/$epnum.status" >> "$tmpdir/cdl/statusall.tmp"
+        tail -n 1 "$tmpdir/cdl/$animegg/$epnum.status" >> "$tmpdir/cdl/$animegg/statusall.tmp"
         # rm $tmpdir/cdl/$epnum.status
     done
-    cat "$tmpdir/cdl/statusall.tmp"
+    cat "$tmpdir/cdl/$animegg/statusall.tmp"
     sleep 0.5
 done
 exit
