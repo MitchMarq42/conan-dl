@@ -1,10 +1,17 @@
-# This is working now. Sort of. Somehow. Filenames are broken, but it does read the config file, and it does download episodes to the proper directory.
+<!-- # This is working now. Sort of. Somehow. Filenames are broken, but it does read the config file, and it does download episodes to the proper directory. -->
+## This is broken at present. [cdl-stable](old/cdl-stable) is the version I would recommend, but gogoanime changed their protocol again. Removed a line from the html. Now we suffer.
+
+## I'm working on an aggressive refactor with multiple outs, but also have a real job so don't expect anything. No life though, thankfully. But hey, one of my patches was added to ani-cli, so it's almost as if Senpai noticed me (!)
 
 Hey. This is a simple(ish) script/program to download anime from gogoanime.vc and save them to a directory on your device.
 The current build
-(as of 10/26/2021, 26/10/2021 for you Europeans)
-does work, and
-uses a combination of curl, youtube-dl, and various arcane shell-isms
+(as of 12/28/2021, 28/12/2021 for you Europeans)
+does
+NOT
+work,
+<!-- and uses -->
+but would use
+a combination of curl, youtube-dl, and various arcane shell-isms
 and requires some semi-specific options in the config file. But whatever.
 I made this mostly for myself, and if you want to use it for yourself
 you can debug and fix it for yourself too. Good luck.
@@ -21,7 +28,7 @@ you can debug and fix it for yourself too. Good luck.
 
   - `sed` (if you don't know, you probably have it)
 
-  - `youtube-dl`
+  - `youtube-dl` (yt-dlp is preferred as it's better)
 
   - `fzf` or another simple menu like `dmenu`. Must be specified with the `$menu` variable.
 

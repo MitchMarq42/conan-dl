@@ -1,10 +1,22 @@
-<h1>This is working now. Sort of. Somehow. Filenames are broken, but it does read the config file, and it does download episodes to the proper directory.</h1>
+<!-- # This is working now. Sort of. Somehow. Filenames are broken, but it does read the config file, and it does download episodes to the proper directory. -->
+
+
+<h2>This is broken at present. <a href="old/cdl-stable">cdl-stable</a> is the version I would recommend, but gogoanime changed their protocol again. Removed a line from the html. Now we suffer.</h2>
+
+<h2>I&rsquo;m working on an aggressive refactor with multiple outs, but also have a real job so don&rsquo;t expect anything. No life though, thankfully. But hey, one of my patches was added to ani-cli, so it&rsquo;s almost as if Senpai noticed me (!)</h2>
 
 <p>Hey. This is a simple(ish) script/program to download anime from gogoanime.vc and save them to a directory on your device.
 The current build
-(as of 10/26/2021, 26/10/2021 for you Europeans)
-does work, and
-uses a combination of curl, youtube-dl, and various arcane shell-isms
+(as of 12/28/2021, 28/12/2021 for you Europeans)
+does
+NOT
+work,</p>
+
+<!-- and uses -->
+
+
+<p>but would use
+a combination of curl, youtube-dl, and various arcane shell-isms
 and requires some semi-specific options in the config file. But whatever.
 I made this mostly for myself, and if you want to use it for yourself
 you can debug and fix it for yourself too. Good luck.</p>
@@ -18,7 +30,7 @@ you can debug and fix it for yourself too. Good luck.</p>
 <li><p>A POSIX-compliant shell. Basically anything other than <code>fish</code> or <code>powershell</code> will work, and this can still be called even from those.</p></li>
 <li><p><code>curl</code> (if you don&rsquo;t know, you probably have it)</p></li>
 <li><p><code>sed</code> (if you don&rsquo;t know, you probably have it)</p></li>
-<li><p><code>youtube-dl</code></p></li>
+<li><p><code>youtube-dl</code> (yt-dlp is preferred as it&rsquo;s better)</p></li>
 <li><p><code>fzf</code> or another simple menu like <code>dmenu</code>. Must be specified with the <code>$menu</code> variable.</p></li>
 <li><p>I recommend downloading and placing the files manually. And I won&rsquo;t provide another way unless someone asks.</p></li>
 </ol>
