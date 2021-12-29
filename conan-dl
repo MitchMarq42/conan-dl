@@ -1,5 +1,6 @@
 #!/bin/sh
 
+### --{{{
 # I've just rewrote conan-dl
 # Now in more POSIX-ish shell!
 # And though it's still cringe
@@ -11,59 +12,27 @@
 # You will know what I meant
 # By the time that I've spent
 # And the way that I still over-comment!
+### }}}--
 
-# default variable assignments
+# Declare
 startingdir="$PWD"
 tmpdir="${TMPDIR:-/tmp}"
-refresh="0.5" # Refresh time for the tui download meter, in seconds
+refresh="0.5"
 watch="no"
-menu="fzf" # Also see config file, it re-defines this if the value is set.
-# Source the config file
-. "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf" # in `dash`, the source command does not exist, but . does the same thing
+menu="fzf"
 
-deps="sh curl sed fzf yt-dlp" # an arbitrary array. Needs fixing
+# Define
 depcheck() {
+    deps="sh curl sed fzf yt-dlp"
     for dep in $deps
     do
-        which "$dep" >/dev/null && # On future OSes the `which` utility may be deprecated. `type` may be your friend
+        which "$dep" >/dev/null &&
         echo "Dependency $dep satisfied!" ||
     echo "$dep not found! Go install it right now."
     done
 }
 
-# Read command-line options
-while getopts ":s:a:f:l:r:o:m:hwd" opt; # Long options would be nice, but limit portability.
-do
-    case $opt in
-        s)    streamsite=$OPTARG;;
-        a)    anime=$OPTARG ;;
-        f)    firstep=$OPTARG ;;
-        l)    lastep=$OPTARG ;;
-        r)    resolution=$OPTARG ;;
-        o)    outputdir=$OPTARG ;;
-        m)    menu=$OPTARG ;;
-        h)
-            cat <<-EOF # this is a heredoc. Basically the snippet of a more civilized age.
-Conan-dl. Use at thy peril.
-      Options are as follows:
-      -s    streamsite
-      -a    anime
-      -f    firstep
-      -l    lastep
-      -r    resolution
-      -m    menu
-      -h    show this help
-EOF
-            exit 0
-            ;;
-        w)    watch="yes" ;; # not implemented. Maybe in the future when this is merged into ani-cli?
-        d)    depcheck; exit ;;
-        *)    echo "Invalid option. Go home."; exit ;;
-    esac
-done
-
-# Integer check. Necessary for lastep resolution.
-is_integer(){
+is_integer() {
     case "${1#[+-]}" in
         (*[!0123456789]*) return 1 ;;
         ('')              return 1 ;;
@@ -71,27 +40,12 @@ is_integer(){
     esac
 }
 
-# Clean up resolution
 get_resolution(){
-    # Remove trailing P from end of resolution
     echo $resolution |
         sed 's/p$//;s/P$//'
 }
-resolution=$(get_resolution)
-
-# Get a feel for the terminal
-LINES=$(tput lines)
-COLUMNS=$(tput cols)
-# _=$((totaleps=(lastep-firstep+1) ))
-# _=$((termstart=(LINES-totaleps-1) ))
-
-# Display human-readable info. Sanity check.
-echo "Approximate anime: $anime"
-echo "Trying episodes: $firstep to $lastep"
-echo "Resolution: $resolution"
 
 search_anime () {
-    # get proper anime name
     search=$(echo "$1" | sed 's/\s/-/g' )
     curl -s "https://$streamsite//search.html" \
         -G \
@@ -106,20 +60,10 @@ get_animegg() {
     search_anime "$anime" |
         $menu
 }
-animegg=$(get_animegg "$anime")
-
-# BROKEN
-# [ "$watch" = "yes" ] >/dev/null && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
-case $watch in
-    yes)        echo "Go use ani-cli, you lazy scum" && exit ;;
-    no)         echo "Downloading" ;;
-esac
-
-echo "Actual anime: $animegg"
 
 get_embedurl() {
-    animegg=$1 #pass in parameters
-    epnum=$2 #pass in parameters
+    animegg=$1
+    epnum=$2
     curl -s "https://$streamsite/$animegg-episode-$epnum" |
     sed -n -E '
         /^[[:space:]]*<a href="#" rel="100"/{
@@ -127,35 +71,63 @@ get_embedurl() {
         q
         }'
 }
+
+get_dlurl() {
+    animegg=$1
+    epnum=$2
+    curl -s "https://$streamsite/$animegg-episode-$epnum" |
+    sed -n -E '
+        /^.*dowloads/s/.*=\"(https:.*)\"\s.*$/\1/p
+        '
+}
+
 get_streamurl() {
     embedurl="$1"
-    streamurl=$(curl -s "$embedurl" |
-    sed -n -E '
+    resolution="$2"
+    tmp_url=$(curl -s "$embedurl" |
+    sed -n -E "
         /^[[:space:]]*sources:/{
         s/.*(https[^'\'']*).*/\1/p
         q
         }
-        '
+        "
     )
+    tmp_url=$(printf '%s' "$streamurl" | sed -n -E 's/(.*)\.([0-9]+\.[0-9]+)\.[0-9]+\.m3u8/\1.\2.m3u8/p')
+    [ -z "$tmp_url" ] || streamurl="$tmp_url"
     echo "$streamurl" | sed -n -E "s/(.*)\.m3u8/\1.$resolution.m3u8/p"
 }
+
+get_mp4url(){
+    animegg="$1"
+    epnum="$2"
+    resolution="$3"
+    dlurl=$(get_dlurl $animegg $epnum)
+    curl -s "$dlurl" |
+    sed -n -E "
+        /.*$resolution.*Download.*$/s/.*=\"(https:.*)\"\s.*$/\1/p
+        "
+}
+
+get_referurl(){
+    referurl=$embedurl
+    [ -z $referurl ] &&
+        referurl=$dlurl
+}
+
 get_episode() {
     epnum=$1
-    embedurl=$2
+    referurl=$2
     streamurl=$3
-    #echo streamurl = "$streamurl"
     yt-dlp \
         "$streamurl" \
-        "--add-header=Referer: $embedurl" \
+        "--add-header=Referer: $referurl" \
         "--restrict-filenames" \
         "--quiet" \
         "--progress" \
         "--newline"
-        #"--output ep.$epnum.%(ext)s" \
 }
 
 get_lastep () {
-    # get final episode number of $animegg
     animegg=$1
     curl -s "https://$streamsite/category/$animegg" |
     sed -n -E '
@@ -182,7 +154,59 @@ get_eps(){
     is_integer $lastep &&
         eps=$(seq "$firstep" "$lastep")
 }
-eps=$(get_eps $firstep $lastep)
+
+# Process
+. "${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
+while getopts ":s:a:f:l:r:o:m:hwdn" opt; # Long options would be nice, but limit portability.
+do
+    case $opt in
+        s)    streamsite=$OPTARG;;
+        a)    anime=$OPTARG ;;
+        f)    firstep=$OPTARG ;;
+        l)    lastep=$OPTARG ;;
+        r)    resolution=$OPTARG ;;
+        o)    outputdir=$OPTARG ;;
+        m)    menu=$OPTARG ;;
+        h)
+            cat <<EOF
+Conan-dl. Use at thy peril.
+      Options are as follows:
+      -s    streamsite
+      -a    anime
+      -f    firstep
+      -l    lastep
+      -r    resolution
+      -m    menu
+      -h    show this help
+EOF
+            exit 0
+            ;;
+        w)    watch="yes" ;;
+        d)    depcheck; exit ;;
+        n)    source_all; exit ;;
+        *)    echo "Invalid option. Go home."; exit ;;
+    esac
+done
+
+resolution=$(get_resolution)
+
+LINES=$(tput lines)
+COLUMNS=$(tput cols)
+# _=$((totaleps=(lastep-firstep+1) ))
+# _=$((termstart=(LINES-totaleps-1) ))
+
+animegg=$(get_animegg "$anime")
+
+# BROKEN
+# [ "$watch" = "yes" ] >/dev/null && echo "Go use ani-cli, you lazy scum" || echo "Downloading"
+case $watch in
+    yes)        echo "Go use ani-cli, you lazy scum" && exit ;;
+    no)         echo "Downloading" ;;
+esac
+
+echo "Actual anime: $animegg"
+
+get_eps $firstep $lastep
 
 mkdir -p "$outputdir" && cd "$outputdir"
 mkdir -p "$tmpdir/cdl/$animegg"
@@ -190,27 +214,34 @@ echo "This might take a while. Go outside."
 for epnum in $eps
 do
     embedurl=$(get_embedurl "$animegg" "$epnum")
-    streamurl=$(get_streamurl "$embedurl")
-    get_episode "$epnum" "$embedurl" "$streamurl" >"$tmpdir/cdl/$animegg/$epnum.status" 2>/dev/null &
+    streamurl=$(get_streamurl "$embedurl" "$resolution")
+    mp4url=$(get_mp4url "$animegg" "$epnum" "$resolution")
+    [ -z $streamurl ] && streamurl=$mp4url
+    get_episode "$epnum" "$referurl" "$streamurl" >"$tmpdir/cdl/$animegg/$epnum.status" 2>/dev/null &
  #&& \        # echo "finished downloading episode $epnum" ||
         # echo "Failed to download episode $epnum!!!" &
     # echo "downloading episode $epnum..."
 done
 
+
+wait
+cd "$startingdir"
+
+# Print
+echo "Approximate anime: $anime"
+echo "Trying episodes: $firstep to $lastep"
+echo "Resolution: $resolution"
 tput sc
-while pgrep yt >/dev/null 2>/dev/null
+while true # pgrep yt >/dev/null 2>/dev/null
 do
     tput rc
     >"$tmpdir/cdl/$animegg/statusall.tmp"
-    for epnum in "$eps"
+    for epnum in $eps
     do
-        tail -n 1 "$tmpdir/cdl/$animegg/$epnum.status" >> "$tmpdir/cdl/$animegg/statusall.tmp" &
+        tail -n 1 "$tmpdir/cdl/$animegg/$epnum.status" >> "$tmpdir/cdl/$animegg/statusall.tmp" #&
         # rm $tmpdir/cdl/$epnum.status
     done
     cat "$tmpdir/cdl/$animegg/statusall.tmp"
     sleep $refresh
 done
-exit
-
-wait
-cd "$startingdir" && echo "all done."
+echo "all done."
