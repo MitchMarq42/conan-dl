@@ -1,11 +1,15 @@
 #!/bin/sh
 
-# Declare{
+#{ Declare
+configfile="${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
 startingdir="$PWD"
-tmpdir="${TMPDIR:-/tmp}"
-refresh="0.5"
-watch="no"
-menu="fzf"#}
+tmpdir="${TMPDIR:-/tmp/cdl/}"
+# refresh="0.5"
+# watch="no"
+menu="fzf"
+streamsite="gogoanime.cm"
+eplist="$startingdir/eplist.list"
+#}
 
 # Define
 ## All functions which use variables must declare all of them as arguments.
@@ -21,28 +25,120 @@ menu () {
     $menu
 }
 get_anime () {
-    # USAGE: search_anime "$search" where $search is the approx anime name
-    search=$1
+    # USAGE: `search_anime "$search"` where $search is the approx anime name
+    search=$(echo $* | sed 's/\s/-/g')
     curl -s "https://$streamsite//search.html" \
-        -G \
-        -d "keyword=$search" |
+        -G --data-binary "keyword=$search" |
     sed -n -E 's_^[[:space:]]*<a href="/category/([^"]*)" title="([^"]*)".*_\1_p' |
     menu
-    # get_animegg is no longer necessary. This does it all and
-    # spits out correctly formatted anime.
+    # This does it all and spits
+    # out correctly formatted anime.
 }
 get_embedurl() {
-    # USAGE: 
-    animegg=$1
-    epnum=$2
-    curl -s "https://$streamsite/$animegg-episode-$epnum" |
+    # USAGE: `get_embedurl "$anime" "$ep"`. $anime == result of get_anime. epnum is int.
+    anime=$1
+    ep=$2
+    curl -s "https://$streamsite/$anime-episode-$ep" |
     sed -n -E '
         /^[[:space:]]*<a href="#" rel="100"/{
         s/.*data-video="([^"]*)".*/https:\1/p
         q
         }'
 }
+get_streamurl() {
+    # USAGE: `get_streamurl "$embedurl $resolution`
+    embedurl="$1"
+    resolution="$2"
+    tmp_url=$(curl -s "$embedurl" |
+        sed -n -E '
+            /^.*sources:/{
+            s/.*(https[^'\'']*).*/\1/p
+            q
+            }
+        '
+    )
+    printf '%s' "$tmp_url" |
+        sed -n -E '
+            s/(.*)\.([0-9]+\.[0-9]+)\.[0-9]+\.m3u8/\1.\2.m3u8/p
+        '
+    echo "$tmp_url" | sed -n -E "s/(.*)\.m3u8/\1.$resolution.m3u8/p"
+}
+get_lastepint () {
+    # USAGE: `get_lastep "$lastep" "$anime"`
+    lastep=$1
+    anime=$2
+    case $( is_integer "$lastep" && echo "yes" ) in
+        yes)        echo "$lastep" ;;
+        '')
+            curl -s "https://$streamsite/category/$anime" |
+            sed -n -E '
+                /^[[:space:]]*<a href="#" class="active" ep_start/{
+                s/.* '\''([0-9]*)'\'' ep_end = '\''([0-9]*)'\''.*/\2/p
+                q
+            }
+            '
+        ;;
+    esac
+}
+get_resolution(){
+    echo "$resolution" |
+        sed 's/p$//;s/P$//'
+}
+get_eps () {
+    # USAGE: `get_eps "$firstep" "$lastepint"` where both are numbers.
+    firstep="$1"
+    lastepint="$2"
+    case $( [ -f "$eplist" ] && echo "yes" ) in
+        yes)    cat "$eplist";;
+        '')     seq "$firstep" "$lastepint";;
+    esac
+}
+faketty() {
+    # USAGE: `faketty <command>` where <command> is anything that spews colors.
+    # Credit: https://stackoverflow.com/questions/1401002/how-to-trick-an-application-into-thinking-its-stdout-is-a-terminal-not-a-pipe
+    script -qfc "$(/bin/printf "%q " "$@")" /dev/null
+}
+monitor_ep(){
+    ep=$1
+    eplogfile="$tmpdir/$anime/$ep.log"
+    tput sc
+    while pgrep yt-dlp # inotifywait -qqm --event modify "$eplogfile"
+    do
+        tput rc
+        tail -f "$eplogfile"
+        sleep 0.5
+    done
+}
+download_episode () {
+    # USAGE: `download_episode "$streamurl" "$embedurl"`
+    streamurl=$1
+    embedurl=$2
+    yt-dlp \
+        "$streamurl" \
+        "--add-header=Referer: $embedurl" \
+        "--restrict-filenames" \
+        "--quiet" \
+        "--progress" > "$eplogfile"
+}
+do_all () {
+    . $configfile
+    anime=$(get_anime "$search")
+    lastepint=$(get_lastepint "$lastep" "$anime")
+    eps=$(get_eps "$firstep" "$lastepint")
+    mkdir -p "$outputdir" && cd "$outputdir"
+    mkdir -p "$tmpdir/$anime"
+    for ep in $eps
+    do
+        embedurl=$(get_embedurl "$anime" "$ep")
+        resolution=$(get_resolution)
+        streamurl=$(get_streamurl "$embedurl" "$resolution")
+        download_episode "$streamurl" "$embedurl" &
+        monitor_ep "$ep" &
+    done
+}
 
 # Process
+do_all
 
 # Print
+
