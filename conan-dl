@@ -21,12 +21,11 @@ is_integer () {
         (*)               return 0 ;;
     esac
 }
-menu () {
+menu() {
     $menu
 }
-get_anime () {
-    # USAGE: `search_anime "$search"` where $search is the approx anime name
-    search=$(echo $* | sed 's/\s/-/g')
+get_anime() { # $search
+    search=$(echo "$@" | sed 's/\s/-/g')
     curl -s "https://$streamsite//search.html" \
         -G --data-binary "keyword=$search" |
     sed -n -E 's_^[[:space:]]*<a href="/category/([^"]*)" title="([^"]*)".*_\1_p' |
@@ -34,8 +33,7 @@ get_anime () {
     # This does it all and spits
     # out correctly formatted anime.
 }
-get_embedurl() {
-    # USAGE: `get_embedurl "$anime" "$ep"`. $anime == result of get_anime. epnum is int.
+get_embedurl() { # $anime $ep
     anime=$1
     ep=$2
     curl -s "https://$streamsite/$anime-episode-$ep" |
@@ -45,8 +43,7 @@ get_embedurl() {
         q
         }'
 }
-get_streamurl() {
-    # USAGE: `get_streamurl "$embedurl $resolution`
+get_streamurl() { # $embedurl $resolution
     embedurl="$1"
     resolution="$2"
     tmp_url=$(curl -s "$embedurl" |
@@ -63,8 +60,7 @@ get_streamurl() {
         '
     echo "$tmp_url" | sed -n -E "s/(.*)\.m3u8/\1.$resolution.m3u8/p"
 }
-get_lastepint () {
-    # USAGE: `get_lastep "$lastep" "$anime"`
+get_lastepint() { # $lastep $anime
     lastep=$1
     anime=$2
     case $( is_integer "$lastep" && echo "yes" ) in
@@ -80,12 +76,11 @@ get_lastepint () {
         ;;
     esac
 }
-get_resolution(){
+get_resolution(){ # $resolution
     echo "$resolution" |
         sed 's/p$//;s/P$//'
 }
-get_eps () {
-    # USAGE: `get_eps "$firstep" "$lastepint"` where both are numbers.
+get_eps() { # $firstep $lastepint
     firstep="$1"
     lastepint="$2"
     case $( [ -f "$eplist" ] && echo "yes" ) in
@@ -93,12 +88,12 @@ get_eps () {
         '')     seq "$firstep" "$lastepint";;
     esac
 }
-faketty() {
+faketty() { # <command $args>
     # USAGE: `faketty <command>` where <command> is anything that spews colors.
     # Credit: https://stackoverflow.com/questions/1401002/how-to-trick-an-application-into-thinking-its-stdout-is-a-terminal-not-a-pipe
     script -qfc "$(/bin/printf "%q " "$@")" /dev/null
 }
-monitor_ep(){
+monitor_ep() { # $ep
     ep=$1
     eplogfile="$tmpdir/$anime/$ep.log"
     tput sc
@@ -109,8 +104,7 @@ monitor_ep(){
         sleep 0.5
     done
 }
-download_episode () {
-    # USAGE: `download_episode "$streamurl" "$embedurl"`
+download_episode() { # $streamurl $embedurl
     streamurl=$1
     embedurl=$2
     yt-dlp \
@@ -120,7 +114,7 @@ download_episode () {
         "--quiet" \
         "--progress" > "$eplogfile"
 }
-do_all () {
+do_all() {
     . $configfile
     anime=$(get_anime "$search")
     lastepint=$(get_lastepint "$lastep" "$anime")
