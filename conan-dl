@@ -1,6 +1,6 @@
 #!/bin/sh
-
-#{ Declare
+# Declare
+#{ declarations
 configfile="${XDG_CONFIG_HOME:-$HOME/.config}/conan-dl/conan-dl.conf"
 startingdir="$PWD"
 tmpdir="${TMPDIR:-/tmp/cdl/}"
@@ -10,7 +10,6 @@ menu="fzf"
 streamsite="gogoanime.cm"
 eplist="$startingdir/eplist.list"
 #}
-
 # Define
 ## All functions which use variables must declare all of them as arguments.
 ## All functions which (re)assign must be in form `get_$var` and give that var on stdout.
