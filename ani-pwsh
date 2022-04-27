@@ -216,9 +216,9 @@ function get-dpagelink(){
 }
 
 function decrypt-link(){
-    sh @"
+    invoke-expression -wait sh @"
 	ajax_url="$base_url/encrypt-ajax.php"
-	id=$(printf "%s" "$1" | sed -nE 's/.*id=(.*)&title.*/\1/p')
+	id=$(printf "%s" "$args" | sed -nE 's/.*id=(.*)&title.*/\1/p')
 	resp=$(curl -s "$args")
 	secret_key=$(printf "%s" "$resp" | sed -nE 's/.*class="container-(.*)">/\1/p' | tr -d "\n" | od -A n -t x1 | tr -d " |\n")
 	iv=$(printf "%s" "$resp" | sed -nE 's/.*class="wrapper container-(.*)">/\1/p' | tr -d "\n" | od -A n -t x1 | tr -d " |\n")
@@ -229,4 +229,38 @@ function decrypt-link(){
 	printf '%s' "$data" | base64 -d | openssl enc -d -aes256 -K "$second_key" -iv "$iv" | sed -e 's/\].*/\]/' -e 's/\\//g' |
 		grep -Eo 'https:\/\/[-a-zA-Z0-9@:%._\+~#=][a-zA-Z0-9][-a-zA-Z0-9@:%_\+.~#?&\/\/=]*'
 "@
+}
+
+function get-videolink(){
+    param([string]$dpage_url)
+    $video_links = decrypt-link $dpage_url
+    if ($video_links -match 'mp4') {
+	$video_url = (get-mp4quality "$video_links")
+	$idx = 1
+    } else {
+	$video_url = $video_links
+	get-m3u8quality
+    }
+}
+
+function get-mp4quality(){
+    switch ($quality) {
+	("best") {$video_url = ($args[3])}
+	("worst") {$video_url = ($args[0])}
+	default {$video_url = $args | where-object {$_ -match 'quality'}
+		 if ($video_url -eq '') {
+		     write-err `
+		       "Current video quality is not available `
+		       (defaulting to best quality)"
+		     $quality = "best"
+		     $video_url = $args[3]
+		 }
+		}
+    }
+    $video_url
+}
+
+function get-m3u8quality(){
+    $m3u8_links = (
+	invoke-webrequest $video_url -headers @{referer = $dpage_link}).links
 }
