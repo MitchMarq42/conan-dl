@@ -1,7 +1,7 @@
-<!-- # This is working now. Sort of. Somehow. Filenames are broken, but it does read the config file, and it does download episodes to the proper directory. -->
-## This is broken at present. [cdl-stable](old/cdl-stable) is the version I would recommend, but gogoanime changed their protocol again. Removed a line from the html. Now we suffer.
+# This is working now. Sort of. Somehow. Filenames are broken, but it does read the config file, and it does download episodes to the proper directory.
+* This is broken at present. [[old/cdl-stable][cdl-stable]] is the version I would recommend, but gogoanime changed their protocol again. Removed a line from the html. Now we suffer.
 
-## I'm working on an aggressive refactor with multiple outs, but also have a real job so don't expect anything. No life though, thankfully. But hey, one of my patches was added to ani-cli, so it's almost as if Senpai noticed me (!)
+* I'm working on an aggressive refactor with multiple outs, but also have a real job so don't expect anything. No life though, thankfully. But hey, one of my patches was added to ani-cli, so it's almost as if Senpai noticed me (!)
 
 Hey. This is a simple(ish) script/program to download anime from gogoanime.vc and save them to a directory on your device.
 The current build
@@ -9,7 +9,7 @@ The current build
 does
 NOT
 work,
-<!-- and uses -->
+# and uses
 but would use
 a combination of curl, youtube-dl, and various arcane shell-isms
 and requires some semi-specific options in the config file. But whatever.
@@ -18,7 +18,7 @@ you can debug and fix it for yourself too. Good luck.
 
 ---
 
-## Installation:
+* Installation:
 
 0. Dependencies:
 
@@ -46,7 +46,7 @@ you can debug and fix it for yourself too. Good luck.
 
   Anything else, you're on your own
 
-## FAQ:
+* FAQ:
 
 I've never been asked about this, but here are some hypothetically important questions one might ask.
 
@@ -72,13 +72,13 @@ I've never been asked about this, but here are some hypothetically important que
 
   If you do have a genuine improvement to bring, however, do feel free to open the proper channel and submit it.
 
-## Special Thanks:
+* Special Thanks:
 
-- (pystardust)[https://github.com/pystardust] for making this concept popular
+- [[https://github.com/pystardust][pystardust]] for making this concept popular
 
-- (Dink4n)[https://github.com/Dink4n] for fixing his work and thus mine
+- [[https://github.com/Dink4n][Dink4n]] for fixing his work and thus mine
 
-- Texas Instruments for embedding an interesting language into their ~~80s iPhones~~calculators
+- Texas Instruments for embedding an interesting language into their +80s iPhones+ calculators
 
 - My friends Charles and Macklen for getting me into anime and coding, respectively
 
