@@ -209,14 +209,13 @@ function update-url(){
 function get-dpagelink(){
     param([string]$anime_id,
 	  [string]$ep_no)
-    $stream_page = invoke-webrequest `
-      ($base_url + "/videos/" + $anime_id + $ep_no)
+    $stream_page = invoke-webrequest "${base_url}/videos/${anime_id}${ep_no}"
     "https:" + (($stream_page.content -split [environment]::newline |
       where-object {$_ -match "iframe"}) -split '"')[1]
 }
 
 function decrypt-link(){
-    invoke-expression -wait sh @"
+    start-process -wait sh -c @"
 	ajax_url="$base_url/encrypt-ajax.php"
 	id=$(printf "%s" "$args" | sed -nE 's/.*id=(.*)&title.*/\1/p')
 	resp=$(curl -s "$args")
