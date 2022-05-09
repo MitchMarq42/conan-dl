@@ -1,7 +1,6 @@
 #!/bin/pwsh
 
 # Declare
-#{ declarations
 $configfile="$HOME/.config/conan-dl/conan-dl.conf"
 $startingdir="$PWD"
 $tmpdir="/tmp/cdl/"
@@ -10,11 +9,13 @@ $tmpdir="/tmp/cdl/"
 $menu="fzf"
 $streamsite="gogoanime.gg"
 $eplist="$startingdir/eplist.list"
-#}
 # Define
 ## All functions which use variables must declare all of them as arguments.
 ## All functions which (re)assign must be in form `get_$var` and give that var on stdout.
-function menu() {
+function menu-select(){
+    param(
+	[dictionary]
+    )
     $menu
 }
 function get_anime() { # $search
@@ -57,17 +58,17 @@ function get_lastepint() { # $lastep $anime
     $lastep=$1
     $anime=$2
     switch ( "$lastep" -is [int] && echo "yes" ) {
-        (yes)        { echo "$lastep" } ;;
-        ('')
-        {curl -s "https://$streamsite/category/$anime" |
-              sed -n -E "
-			 /^[[:space:]]*<a href="#" class="active" ep_start/{
-			     s/.* "([0-9]*)' ep_end = '([0-9]*)'.*/\2/p
-			     q
-			 }
-			 "
+	(yes)        { echo "$lastep" }
+	('')
+	{curl -s "https://$streamsite/category/$anime" |
+	  sed -n -E "
+/^[[:space:]]*<a href="#" class="active" ep_start/{
+	 s/.* "([0-9]*)' ep_end = '([0-9]*)'.*/\2/p
+			 q
+			}
+"
 	}
-        ;;
+	;;
     }
 }
 function get_resolution(){ # $resolution
@@ -82,7 +83,7 @@ function get_eps() { # $firstep $lastepint
         ('')     { seq "$firstep" "$lastepint" };;
     }
 }
-function faketty() { # <command $args>
+function faketty() {
     # USAGE: `faketty <command>` where <command> is anything that spews colors.
     # Credit: https://stackoverflow.com/questions/1401002/how-to-trick-an-application-into-thinking-its-stdout-is-a-terminal-not-a-pipe
     script -qfc "$(/bin/printf "%q " "$@")" /dev/null
@@ -98,7 +99,7 @@ function monitor_ep() { # $ep
         sleep 0.5
     }
 }
-function download_episode() { # $streamurl $embedurl
+function download_episode() {
     $streamurl=$1
     $embedurl=$2
     yt-dlp `

@@ -5,53 +5,53 @@
 # worth...
 
 param(
-    [string[]]$search ,
+    [string]$search ,
     [string]$quality ,
     [string]$outdir ,
     [int]$firstep ,
-    [int]$lastep #,
+    [int]$lastep ,
+    [string]$menu ,
+    [string]$player
 )
 
 $startingdir = get-location
-$streamsite = "gogoanime.gg"
 
-function get-anime(){
-    param(
-	[string[]]$search
-    )
-    $resultpage = invoke-webrequest "https://$streamsite//search.html?keyword=$search"
-    $allanime = (
-	$resultpage.links.href |
-	  where-object {$_ -match "/category"}
-    ) -replace '/category/',''
-    $allanime
+[uri]$streamsite = "https://gogoanime.sk"
+
+<# rough procedure:
+
+- search gogoanime
+- $menu with names -> selects an ID
+- go to stream page - simple url
+- navigate to download page
+- click button of $resolution
+- save mp4 or play with $player
+#>
+
+# search gogoanime
+$searchurl = $streamsite.tostring() + `
+  "/search.html?keyword=" + `
+  [uri]::escapedatastring($search)
+invoke-webrequest $searchurl
+
+# $menu with names -> selects an ID
+$table = @{
+    "Detective Conan" = "detective-conan"
+    "A good show" = "cowboy-bebop"
 }
+$prettyname = $table.keys | fzf
+$anime_id = $table.$prettyname
 
-function get-embedurl(){
-    param(
-	[string]$anime ,
-	[int]$ep
-    )
-    $streamurl = invoke-webrequest `
-      -uri ("https://" + $streamsite + "/" + $anime + "-episode-" + $ep)
-    $embedurl = "https:" + (
-	$streamurl.links |
-	  where-object {$_.outerhtml -match "data-video"} |
-	  where-object {$_.rel -eq 100}
-    )."data-video"
-    $embedurl
-}
+# go to stream page - simple url
+$streamurl = $streamsite.tostring() + `
+  $anime_id + `
+  "-episode-" + `
+  $current_ep
+$streampage = invoke-webrequest $streamurl
 
-function get-streamurl(){
-    param(
-	[string]$embedurl ,
-	[int]$resolution
-    )
-    $tmp_url = (
-	invoke-webrequest $embedurl 
-    )
-}
+# navigate to download page
+$dllink = $streampage.links | where-object {$_ -match 'download'}
+$dlpage = invoke-webrequest $dllink.href
 
-
-# ((iwr "gogoanime.gg//search.html?keyword=detective conan").links |
-#   where-object {$_.href -match '/category'}).href
+# click button of $resolution
+$dlpage.links
